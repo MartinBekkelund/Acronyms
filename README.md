@@ -14,6 +14,7 @@ A WordPress plugin that automatically wraps the first occurrence of defined acro
 - Includes `<abbr>` tags in RSS feed output
 - Touch-friendly tooltip on mobile devices
 - Configurable post type support
+- Central list of common acronyms, used together with your own
 - Simple admin interface under Settings > Acronyms
 
 ## Requirements
@@ -41,6 +42,28 @@ Navigate to **Settings > Acronyms** in the WordPress admin. The "Manage Acronyms
 ### Settings
 
 The "Settings" tab lets you choose which post types the plugin applies to. By default, it processes Posts and Pages.
+
+### Central List
+
+The plugin comes with a central list of common acronyms ([`data/central-acronyms.json`](data/central-acronyms.json)), shown together with your own in the acronym list:
+
+- If you add an acronym with the same text, yours is used, and the central one is marked "Overridden by local".
+- Central acronyms can't be edited or deleted, but you can turn each one off or on for your site.
+
+Under **Settings**, you can turn on a daily fetch of the latest central list. It is off by default. The default source is the file in this repository, but you can enter your own URL, for example to share one list across several sites. If a fetch fails, the last good copy is used.
+
+The file format:
+
+```json
+{
+	"version": 1,
+	"acronyms": [
+		{ "acronym": "HTML", "title": "HyperText Markup Language", "case_sensitive": true }
+	]
+}
+```
+
+The URL must use https, the file can be at most 1 MB, and it can hold at most 5000 acronyms.
 
 ### Manual `<abbr>` Elements
 

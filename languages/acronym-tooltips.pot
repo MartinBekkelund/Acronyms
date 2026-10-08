@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Acronyms 1.0.0\n"
+"Project-Id-Version: Acronyms 1.1.0\n"
 "Report-Msgid-Bugs-To: https://github.com/MartinBekkelund/Acronyms/issues\n"
-"POT-Creation-Date: 2026-10-08 18:13+0200\n"
+"POT-Creation-Date: 2026-10-08 18:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,9 +16,10 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
 #: includes/class-acronyms-admin.php:37 includes/class-acronyms-admin.php:38
-#: includes/class-acronyms-admin.php:353
+#: includes/class-acronyms-admin.php:591
 msgid "Acronyms"
 msgstr ""
 
@@ -30,138 +31,311 @@ msgstr ""
 msgid "Post Types"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:93
+#: includes/class-acronyms-admin.php:96
+msgid "Central List"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:103
+msgid "Fetch Updates"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:111
+msgid "List URL"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:147
+msgid ""
+"The list URL must be a valid address starting with https://. The previous "
+"URL is kept."
+msgstr ""
+
+#: includes/class-acronyms-admin.php:160
+msgid ""
+"The plugin comes with a central list of common acronyms, used together with "
+"your own. If you have an acronym with the same text, yours is used. You can "
+"turn off single central acronyms in the acronym list."
+msgstr ""
+
+#: includes/class-acronyms-admin.php:171
+msgid "Fetch the latest central list from the internet once a day"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:172
+msgid ""
+"Off by default. When on, your site downloads the list from the URL below. "
+"Nothing about your site is sent beyond a normal web request. When off, the "
+"copy bundled with the plugin is used."
+msgstr ""
+
+#: includes/class-acronyms-admin.php:188
+msgid "Leave empty to use the default list:"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:195
+msgid "Restore default URL"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:239
 msgid "Choose which post types the acronym replacement should apply to."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:135
+#: includes/class-acronyms-admin.php:281
 msgid "Are you sure you want to delete this acronym?"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:164 includes/class-acronyms-admin.php:221
-#: includes/class-acronyms-admin.php:295
+#: includes/class-acronyms-admin.php:314 includes/class-acronyms-admin.php:343
+#: includes/class-acronyms-admin.php:372 includes/class-acronyms-admin.php:402
+#: includes/class-acronyms-admin.php:459 includes/class-acronyms-admin.php:533
 msgid "Unauthorized access."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:181 includes/class-acronyms-admin.php:250
+#: includes/class-acronyms-admin.php:419 includes/class-acronyms-admin.php:488
 msgid "An acronym with this text already exists."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:205
+#: includes/class-acronyms-admin.php:443
 msgid "Failed to add the acronym. Please try again."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:230
+#: includes/class-acronyms-admin.php:468
 msgid "Invalid acronym ID."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:236
+#: includes/class-acronyms-admin.php:474
 msgid "Acronym not found."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:274
+#: includes/class-acronyms-admin.php:512
 msgid "Failed to update the acronym. Please try again."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:321
+#: includes/class-acronyms-admin.php:559
 msgid "Acronym text is required."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:325
+#: includes/class-acronyms-admin.php:563
 msgid "Full meaning is required."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:329
+#: includes/class-acronyms-admin.php:567
 msgid "Acronym text must be 100 characters or fewer."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:333
+#: includes/class-acronyms-admin.php:571
 msgid "Full meaning must be 500 characters or fewer."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:358
+#: includes/class-acronyms-admin.php:596
 msgid "Manage Acronyms"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:362
+#: includes/class-acronyms-admin.php:600
 msgid "Settings"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:388
+#: includes/class-acronyms-admin.php:626
 msgid "Acronym added successfully."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:389
+#: includes/class-acronyms-admin.php:627
 msgid "Acronym updated successfully."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:390
+#: includes/class-acronyms-admin.php:628
 msgid "Acronym deleted successfully."
 msgstr ""
 
-#: includes/class-acronyms-admin.php:422
+#: includes/class-acronyms-admin.php:629
+msgid "Central acronym turned off for this site."
+msgstr ""
+
+#: includes/class-acronyms-admin.php:630
+msgid "Central acronym turned on for this site."
+msgstr ""
+
+#: includes/class-acronyms-admin.php:631
+msgid "Central list fetched."
+msgstr ""
+
+#: includes/class-acronyms-admin.php:632
+msgid "The default URL for the central list is restored."
+msgstr ""
+
+#: includes/class-acronyms-admin.php:645
+msgid "Could not fetch the central list. See the status below for details."
+msgstr ""
+
+#: includes/class-acronyms-admin.php:671
 msgid "Edit Acronym"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:422
+#: includes/class-acronyms-admin.php:671
 msgid "Add New Acronym"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:440
+#: includes/class-acronyms-admin.php:689
 #: includes/class-acronyms-list-table.php:39
 msgid "Acronym"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:450
+#: includes/class-acronyms-admin.php:699
 #: includes/class-acronyms-list-table.php:40
 msgid "Full Meaning"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:459
+#: includes/class-acronyms-admin.php:708
 #: includes/class-acronyms-list-table.php:41
 msgid "Case Sensitive"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:464
+#: includes/class-acronyms-admin.php:713
 msgid "Match exact case only"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:472
+#: includes/class-acronyms-admin.php:721
 msgid "Update Acronym"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:472
+#: includes/class-acronyms-admin.php:721
 msgid "Add Acronym"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:478
+#: includes/class-acronyms-admin.php:727
 msgid "Cancel"
 msgstr ""
 
-#: includes/class-acronyms-admin.php:494
+#: includes/class-acronyms-admin.php:743
 msgid "Search Acronyms"
 msgstr ""
 
+#: includes/class-acronyms-admin.php:777
+msgid "Fetched from the URL"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:779
+msgid "Bundled with the plugin (no successful fetch yet)"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:781
+msgid "Bundled with the plugin"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:784
+msgid "Central List Status"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:787
+msgid "In use"
+msgstr ""
+
+#. translators: %d: number of acronyms.
+#: includes/class-acronyms-admin.php:793
+#, php-format
+msgid "%d acronym"
+msgid_plural "%d acronyms"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-acronyms-admin.php:799
+msgid "Last fetched"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:804
+msgid "Never"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:810
+msgid "Last error"
+msgstr ""
+
+#: includes/class-acronyms-admin.php:815
+msgid "The last good copy is used until a fetch succeeds."
+msgstr ""
+
+#: includes/class-acronyms-admin.php:823
+msgid "Fetch now"
+msgstr ""
+
+#: includes/class-acronyms-central.php:183
+msgid "The file is not a valid central acronym list."
+msgstr ""
+
+#: includes/class-acronyms-central.php:187
+msgid "The file uses a format version this plugin does not support."
+msgstr ""
+
+#. translators: %d: maximum number of acronyms.
+#: includes/class-acronyms-central.php:194
+#, php-format
+msgid "The file has more than %d acronyms."
+msgstr ""
+
+#: includes/class-acronyms-central.php:225
+msgid "The file has no valid acronyms."
+msgstr ""
+
+#: includes/class-acronyms-central.php:274
+msgid "The URL must start with https://."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: includes/class-acronyms-central.php:295
+#, php-format
+msgid "The server answered with HTTP status %d."
+msgstr ""
+
 #: includes/class-acronyms-list-table.php:42
+msgid "Source"
+msgstr ""
+
+#: includes/class-acronyms-list-table.php:43
 msgid "Date Added"
 msgstr ""
 
-#: includes/class-acronyms-list-table.php:148
+#: includes/class-acronyms-list-table.php:193
+msgid "Local"
+msgstr ""
+
+#: includes/class-acronyms-list-table.php:197
+msgid "Active"
+msgstr ""
+
+#: includes/class-acronyms-list-table.php:198
+msgid "Turned off"
+msgstr ""
+
+#: includes/class-acronyms-list-table.php:199
+msgid "Overridden by local"
+msgstr ""
+
+#: includes/class-acronyms-list-table.php:204
+msgid "Central"
+msgstr ""
+
+#: includes/class-acronyms-list-table.php:255
+msgid "Turn on"
+msgstr ""
+
+#: includes/class-acronyms-list-table.php:255
+msgid "Turn off"
+msgstr ""
+
+#: includes/class-acronyms-list-table.php:297
 msgid "Edit"
 msgstr ""
 
-#: includes/class-acronyms-list-table.php:153
+#: includes/class-acronyms-list-table.php:302
 msgid "Delete"
 msgstr ""
 
-#: includes/class-acronyms-list-table.php:172
+#: includes/class-acronyms-list-table.php:321
 msgid "Yes"
 msgstr ""
 
-#: includes/class-acronyms-list-table.php:173
+#: includes/class-acronyms-list-table.php:322
 msgid "No"
 msgstr ""
 
-#: includes/class-acronyms-list-table.php:180
+#: includes/class-acronyms-list-table.php:329
 msgid "No acronyms found."
 msgstr ""
