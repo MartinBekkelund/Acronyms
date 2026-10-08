@@ -44,7 +44,10 @@ class Acronyms_Filter {
 			ACRONYMS_PLUGIN_URL . 'js/frontend.js',
 			array(),
 			ACRONYMS_VERSION,
-			true
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
 		);
 	}
 
@@ -193,10 +196,8 @@ class Acronyms_Filter {
 				if ( $abbr_text === $acr->acronym ) {
 					return true;
 				}
-			} else {
-				if ( mb_strtolower( $abbr_text ) === mb_strtolower( $acr->acronym ) ) {
-					return true;
-				}
+			} elseif ( mb_strtolower( $abbr_text ) === mb_strtolower( $acr->acronym ) ) {
+				return true;
 			}
 		}
 

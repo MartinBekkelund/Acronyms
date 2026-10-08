@@ -1,0 +1,10 @@
+/.git
+/.github
+/.claude
+/.wordpress-org
+/node_modules
+/build
+.gitignore
+.distignore
+.DS_Store
+README.md

@@ -32,10 +32,6 @@ require_once ACRONYMS_PLUGIN_DIR . 'includes/class-acronyms-list-table.php';
 register_activation_hook( __FILE__, array( 'Acronyms_DB', 'activate' ) );
 register_deactivation_hook( __FILE__, array( 'Acronyms_DB', 'deactivate' ) );
 
-add_action( 'init', function () {
-	load_plugin_textdomain( 'acronym-tooltips', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-} );
-
 add_action( 'admin_init', array( 'Acronyms_DB', 'maybe_upgrade' ) );
 
 if ( is_admin() ) {

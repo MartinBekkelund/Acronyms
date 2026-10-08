@@ -141,7 +141,7 @@ class Acronyms_Admin {
 	 * Handle add, edit, and delete actions.
 	 */
 	public function handle_actions() {
-		if ( ! isset( $_REQUEST['page'] ) || 'acronyms' !== $_REQUEST['page'] ) {
+		if ( ! isset( $_REQUEST['page'] ) || 'acronyms' !== $_REQUEST['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only routes to handlers, which verify their own nonces.
 			return;
 		}
 
@@ -404,7 +404,7 @@ class Acronyms_Admin {
 	 * Render the Manage Acronyms tab.
 	 */
 	private function render_manage_tab() {
-		$editing  = false;
+		$editing   = false;
 		$edit_item = null;
 
 		if ( isset( $_GET['action'], $_GET['id'] ) && 'edit' === $_GET['action'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
