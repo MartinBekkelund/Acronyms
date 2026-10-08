@@ -44,7 +44,10 @@ class Acronyms_Filter {
 			ACRONYMS_PLUGIN_URL . 'js/frontend.js',
 			array(),
 			ACRONYMS_VERSION,
-			true
+			array(
+				'in_footer' => true,
+				'strategy'  => 'defer',
+			)
 		);
 	}
 

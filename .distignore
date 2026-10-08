@@ -1,0 +1,14 @@
+/.git
+/.github
+/.claude
+/.wordpress-org
+/vendor
+/node_modules
+/build
+.gitignore
+.distignore
+.DS_Store
+composer.json
+composer.lock
+phpcs.xml.dist
+README.md

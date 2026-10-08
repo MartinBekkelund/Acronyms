@@ -43,6 +43,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7.0.1
+      # Build the same file set that goes to WordPress.org, in a folder named after the slug.
+      - name: Build plugin folder
+        run: rsync -a --exclude-from=.distignore ./ build/acronym-tooltips/
       - uses: wordpress/plugin-check-action@v1.1.9
         with:
-          exclude-directories: 'vendor,.github'
+          build-dir: 'build/acronym-tooltips'
