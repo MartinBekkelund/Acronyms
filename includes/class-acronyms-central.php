@@ -18,7 +18,7 @@ class Acronyms_Central {
 	 *
 	 * @var string
 	 */
-	const DEFAULT_URL = 'https://raw.githubusercontent.com/MartinBekkelund/Acronyms/main/data/central-acronyms.json';
+	const DEFAULT_URL = 'https://raw.githubusercontent.com/MartinBekkelund/Acronyms/main/data/central-acronyms.json'; // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent -- A JSON data file, not a script or asset. Fetching is off by default and documented in readme.txt under External services.
 
 	/**
 	 * WP-Cron hook for the daily fetch.
