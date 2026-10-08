@@ -34,8 +34,8 @@ class Acronyms_Admin {
 	 */
 	public function add_menu_page() {
 		$this->page_hook = add_options_page(
-			__( 'Acronyms', 'acronyms' ),
-			__( 'Acronyms', 'acronyms' ),
+			__( 'Acronyms', 'acronym-tooltips' ),
+			__( 'Acronyms', 'acronym-tooltips' ),
 			'manage_options',
 			'acronyms',
 			array( $this, 'render_page' )
@@ -58,14 +58,14 @@ class Acronyms_Admin {
 
 		add_settings_section(
 			'acronyms_content_filtering',
-			__( 'Content Filtering', 'acronyms' ),
+			__( 'Content Filtering', 'acronym-tooltips' ),
 			array( $this, 'render_settings_section' ),
 			'acronyms_settings'
 		);
 
 		add_settings_field(
 			'acronyms_post_types',
-			__( 'Post Types', 'acronyms' ),
+			__( 'Post Types', 'acronym-tooltips' ),
 			array( $this, 'render_post_types_field' ),
 			'acronyms_settings',
 			'acronyms_content_filtering'
@@ -90,7 +90,7 @@ class Acronyms_Admin {
 	 * Render the settings section description.
 	 */
 	public function render_settings_section() {
-		echo '<p>' . esc_html__( 'Choose which post types the acronym replacement should apply to.', 'acronyms' ) . '</p>';
+		echo '<p>' . esc_html__( 'Choose which post types the acronym replacement should apply to.', 'acronym-tooltips' ) . '</p>';
 	}
 
 	/**
@@ -132,7 +132,7 @@ class Acronyms_Admin {
 			'acronyms-admin',
 			'acronymsAdmin',
 			array(
-				'confirmDelete' => __( 'Are you sure you want to delete this acronym?', 'acronyms' ),
+				'confirmDelete' => __( 'Are you sure you want to delete this acronym?', 'acronym-tooltips' ),
 			)
 		);
 	}
@@ -161,7 +161,7 @@ class Acronyms_Admin {
 		check_admin_referer( 'acronyms_add', 'acronyms_nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Unauthorized access.', 'acronyms' ) );
+			wp_die( esc_html__( 'Unauthorized access.', 'acronym-tooltips' ) );
 		}
 
 		$acronym        = sanitize_text_field( wp_unslash( $_POST['acronym'] ?? '' ) );
@@ -178,7 +178,7 @@ class Acronyms_Admin {
 			add_settings_error(
 				'acronyms',
 				'acronyms_duplicate',
-				__( 'An acronym with this text already exists.', 'acronyms' ),
+				__( 'An acronym with this text already exists.', 'acronym-tooltips' ),
 				'error'
 			);
 			return;
@@ -202,7 +202,7 @@ class Acronyms_Admin {
 		add_settings_error(
 			'acronyms',
 			'acronyms_error',
-			__( 'Failed to add the acronym. Please try again.', 'acronyms' ),
+			__( 'Failed to add the acronym. Please try again.', 'acronym-tooltips' ),
 			'error'
 		);
 	}
@@ -218,7 +218,7 @@ class Acronyms_Admin {
 		check_admin_referer( 'acronyms_edit', 'acronyms_nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Unauthorized access.', 'acronyms' ) );
+			wp_die( esc_html__( 'Unauthorized access.', 'acronym-tooltips' ) );
 		}
 
 		$id             = absint( $_POST['acronym_id'] ?? 0 );
@@ -227,13 +227,13 @@ class Acronyms_Admin {
 		$case_sensitive = isset( $_POST['case_sensitive'] );
 
 		if ( 0 === $id ) {
-			add_settings_error( 'acronyms', 'acronyms_error', __( 'Invalid acronym ID.', 'acronyms' ), 'error' );
+			add_settings_error( 'acronyms', 'acronyms_error', __( 'Invalid acronym ID.', 'acronym-tooltips' ), 'error' );
 			return;
 		}
 
 		$existing = Acronyms_DB::get_acronym( $id );
 		if ( ! $existing ) {
-			add_settings_error( 'acronyms', 'acronyms_error', __( 'Acronym not found.', 'acronyms' ), 'error' );
+			add_settings_error( 'acronyms', 'acronyms_error', __( 'Acronym not found.', 'acronym-tooltips' ), 'error' );
 			return;
 		}
 
@@ -247,7 +247,7 @@ class Acronyms_Admin {
 			add_settings_error(
 				'acronyms',
 				'acronyms_duplicate',
-				__( 'An acronym with this text already exists.', 'acronyms' ),
+				__( 'An acronym with this text already exists.', 'acronym-tooltips' ),
 				'error'
 			);
 			return;
@@ -271,7 +271,7 @@ class Acronyms_Admin {
 		add_settings_error(
 			'acronyms',
 			'acronyms_error',
-			__( 'Failed to update the acronym. Please try again.', 'acronyms' ),
+			__( 'Failed to update the acronym. Please try again.', 'acronym-tooltips' ),
 			'error'
 		);
 	}
@@ -292,7 +292,7 @@ class Acronyms_Admin {
 		check_admin_referer( 'acronyms_delete_' . $id );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Unauthorized access.', 'acronyms' ) );
+			wp_die( esc_html__( 'Unauthorized access.', 'acronym-tooltips' ) );
 		}
 
 		Acronyms_DB::delete_acronym( $id );
@@ -318,19 +318,19 @@ class Acronyms_Admin {
 	 */
 	private function validate_acronym( $acronym, $title ) {
 		if ( empty( $acronym ) ) {
-			return __( 'Acronym text is required.', 'acronyms' );
+			return __( 'Acronym text is required.', 'acronym-tooltips' );
 		}
 
 		if ( empty( $title ) ) {
-			return __( 'Full meaning is required.', 'acronyms' );
+			return __( 'Full meaning is required.', 'acronym-tooltips' );
 		}
 
 		if ( mb_strlen( $acronym ) > 100 ) {
-			return __( 'Acronym text must be 100 characters or fewer.', 'acronyms' );
+			return __( 'Acronym text must be 100 characters or fewer.', 'acronym-tooltips' );
 		}
 
 		if ( mb_strlen( $title ) > 500 ) {
-			return __( 'Full meaning must be 500 characters or fewer.', 'acronyms' );
+			return __( 'Full meaning must be 500 characters or fewer.', 'acronym-tooltips' );
 		}
 
 		return null;
@@ -350,16 +350,16 @@ class Acronyms_Admin {
 
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Acronyms', 'acronyms' ); ?></h1>
+			<h1><?php esc_html_e( 'Acronyms', 'acronym-tooltips' ); ?></h1>
 
 			<h2 class="nav-tab-wrapper">
 				<a href="<?php echo esc_url( admin_url( 'options-general.php?page=acronyms&tab=manage' ) ); ?>"
 					class="nav-tab <?php echo 'manage' === $active_tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'Manage Acronyms', 'acronyms' ); ?>
+					<?php esc_html_e( 'Manage Acronyms', 'acronym-tooltips' ); ?>
 				</a>
 				<a href="<?php echo esc_url( admin_url( 'options-general.php?page=acronyms&tab=settings' ) ); ?>"
 					class="nav-tab <?php echo 'settings' === $active_tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'Settings', 'acronyms' ); ?>
+					<?php esc_html_e( 'Settings', 'acronym-tooltips' ); ?>
 				</a>
 			</h2>
 
@@ -385,9 +385,9 @@ class Acronyms_Admin {
 		$message = sanitize_text_field( wp_unslash( $_GET['message'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$messages = array(
-			'added'   => __( 'Acronym added successfully.', 'acronyms' ),
-			'updated' => __( 'Acronym updated successfully.', 'acronyms' ),
-			'deleted' => __( 'Acronym deleted successfully.', 'acronyms' ),
+			'added'   => __( 'Acronym added successfully.', 'acronym-tooltips' ),
+			'updated' => __( 'Acronym updated successfully.', 'acronym-tooltips' ),
+			'deleted' => __( 'Acronym deleted successfully.', 'acronym-tooltips' ),
 		);
 
 		if ( isset( $messages[ $message ] ) ) {
@@ -419,7 +419,7 @@ class Acronyms_Admin {
 
 		?>
 		<div style="margin-top: 20px;">
-			<h3><?php echo $editing ? esc_html__( 'Edit Acronym', 'acronyms' ) : esc_html__( 'Add New Acronym', 'acronyms' ); ?></h3>
+			<h3><?php echo $editing ? esc_html__( 'Edit Acronym', 'acronym-tooltips' ) : esc_html__( 'Add New Acronym', 'acronym-tooltips' ); ?></h3>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'options-general.php?page=acronyms' ) ); ?>">
 				<?php
@@ -437,7 +437,7 @@ class Acronyms_Admin {
 				<table class="form-table">
 					<tr>
 						<th scope="row">
-							<label for="acronym"><?php esc_html_e( 'Acronym', 'acronyms' ); ?></label>
+							<label for="acronym"><?php esc_html_e( 'Acronym', 'acronym-tooltips' ); ?></label>
 						</th>
 						<td>
 							<input type="text" id="acronym" name="acronym" class="regular-text"
@@ -447,7 +447,7 @@ class Acronyms_Admin {
 					</tr>
 					<tr>
 						<th scope="row">
-							<label for="acronym_title"><?php esc_html_e( 'Full Meaning', 'acronyms' ); ?></label>
+							<label for="acronym_title"><?php esc_html_e( 'Full Meaning', 'acronym-tooltips' ); ?></label>
 						</th>
 						<td>
 							<input type="text" id="acronym_title" name="acronym_title" class="regular-text"
@@ -456,12 +456,12 @@ class Acronyms_Admin {
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><?php esc_html_e( 'Case Sensitive', 'acronyms' ); ?></th>
+						<th scope="row"><?php esc_html_e( 'Case Sensitive', 'acronym-tooltips' ); ?></th>
 						<td>
 							<label>
 								<input type="checkbox" name="case_sensitive" value="1"
 									<?php echo ( ! $editing || $edit_item->case_sensitive ) ? 'checked' : ''; ?> />
-								<?php esc_html_e( 'Match exact case only', 'acronyms' ); ?>
+								<?php esc_html_e( 'Match exact case only', 'acronym-tooltips' ); ?>
 							</label>
 						</td>
 					</tr>
@@ -469,13 +469,13 @@ class Acronyms_Admin {
 
 				<?php
 				submit_button(
-					$editing ? __( 'Update Acronym', 'acronyms' ) : __( 'Add Acronym', 'acronyms' )
+					$editing ? __( 'Update Acronym', 'acronym-tooltips' ) : __( 'Add Acronym', 'acronym-tooltips' )
 				);
 				?>
 
 				<?php if ( $editing ) : ?>
 					<a href="<?php echo esc_url( admin_url( 'options-general.php?page=acronyms' ) ); ?>">
-						<?php esc_html_e( 'Cancel', 'acronyms' ); ?>
+						<?php esc_html_e( 'Cancel', 'acronym-tooltips' ); ?>
 					</a>
 				<?php endif; ?>
 			</form>
@@ -491,7 +491,7 @@ class Acronyms_Admin {
 		<form method="get">
 			<input type="hidden" name="page" value="acronyms" />
 			<?php
-			$list_table->search_box( __( 'Search Acronyms', 'acronyms' ), 'acronyms-search' );
+			$list_table->search_box( __( 'Search Acronyms', 'acronym-tooltips' ), 'acronyms-search' );
 			$list_table->display();
 			?>
 		</form>

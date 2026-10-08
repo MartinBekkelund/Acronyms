@@ -36,10 +36,10 @@ class Acronyms_List_Table extends WP_List_Table {
 	 */
 	public function get_columns() {
 		return array(
-			'acronym'        => __( 'Acronym', 'acronyms' ),
-			'title'          => __( 'Full Meaning', 'acronyms' ),
-			'case_sensitive' => __( 'Case Sensitive', 'acronyms' ),
-			'created_at'     => __( 'Date Added', 'acronyms' ),
+			'acronym'        => __( 'Acronym', 'acronym-tooltips' ),
+			'title'          => __( 'Full Meaning', 'acronym-tooltips' ),
+			'case_sensitive' => __( 'Case Sensitive', 'acronym-tooltips' ),
+			'created_at'     => __( 'Date Added', 'acronym-tooltips' ),
 		);
 	}
 
@@ -145,12 +145,12 @@ class Acronyms_List_Table extends WP_List_Table {
 			'edit'   => sprintf(
 				'<a href="%s">%s</a>',
 				esc_url( $edit_url ),
-				esc_html__( 'Edit', 'acronyms' )
+				esc_html__( 'Edit', 'acronym-tooltips' )
 			),
 			'delete' => sprintf(
 				'<a href="%s" class="acronyms-delete-link">%s</a>',
 				esc_url( $delete_url ),
-				esc_html__( 'Delete', 'acronyms' )
+				esc_html__( 'Delete', 'acronym-tooltips' )
 			),
 		);
 
@@ -169,14 +169,14 @@ class Acronyms_List_Table extends WP_List_Table {
 	 */
 	public function column_case_sensitive( $item ) {
 		return $item->case_sensitive
-			? esc_html__( 'Yes', 'acronyms' )
-			: esc_html__( 'No', 'acronyms' );
+			? esc_html__( 'Yes', 'acronym-tooltips' )
+			: esc_html__( 'No', 'acronym-tooltips' );
 	}
 
 	/**
 	 * Message displayed when no acronyms are found.
 	 */
 	public function no_items() {
-		esc_html_e( 'No acronyms found.', 'acronyms' );
+		esc_html_e( 'No acronyms found.', 'acronym-tooltips' );
 	}
 }
