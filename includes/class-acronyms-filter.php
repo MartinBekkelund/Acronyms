@@ -193,10 +193,8 @@ class Acronyms_Filter {
 				if ( $abbr_text === $acr->acronym ) {
 					return true;
 				}
-			} else {
-				if ( mb_strtolower( $abbr_text ) === mb_strtolower( $acr->acronym ) ) {
-					return true;
-				}
+			} elseif ( mb_strtolower( $abbr_text ) === mb_strtolower( $acr->acronym ) ) {
+				return true;
 			}
 		}
 
