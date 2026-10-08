@@ -1,0 +1,42 @@
+name: Deploy to WordPress.org
+
+# Runs when a release is published on GitHub (not for pre-releases).
+# The release tag must match the plugin version, e.g. 1.1.0.
+on:
+  release:
+    types: [released]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Deploy to WordPress.org
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Check that the tag matches the plugin version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          header=$(grep -m1 '^ \* Version:' acronym-tooltips.php | awk '{print $3}')
+          constant=$(grep -m1 "define( 'ACRONYMS_VERSION'" acronym-tooltips.php | cut -d"'" -f4)
+          stable=$(grep -m1 '^Stable tag:' readme.txt | awk '{print $3}')
+          echo "Tag: $TAG, header: $header, constant: $constant, stable tag: $stable"
+          [ "$TAG" = "$header" ] && [ "$TAG" = "$constant" ] && [ "$TAG" = "$stable" ]
+
+      - name: Deploy
+        id: deploy
+        uses: 10up/action-wordpress-plugin-deploy@2.3.0
+        with:
+          generate-zip: true
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: acronym-tooltips
+
+      - name: Attach zip to the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" "${{ steps.deploy.outputs.zip-path }}"

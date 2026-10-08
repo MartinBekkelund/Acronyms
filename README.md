@@ -73,6 +73,22 @@ If you manually add an `<abbr>` element for an acronym in your post content, the
 
 If you use a page caching plugin (WP Super Cache, WP Rocket, etc.), cached pages will not immediately reflect changes to your acronym list. The updated acronyms will appear once the cache expires or is cleared.
 
+## Development and Releases
+
+Every pull request runs a PHP syntax check (PHP 7.4 and 8.3) and WordPress [Plugin Check](https://github.com/WordPress/plugin-check-action). There is no build step and no dependencies.
+
+To release a new version:
+
+1. Update the version in three places: `Version:` in `acronym-tooltips.php`, `ACRONYMS_VERSION` in the same file, and `Stable tag:` in `readme.txt`. Add a changelog entry in `readme.txt`.
+2. Merge to `main`.
+3. Publish a release on GitHub with the version as tag, e.g. `1.1.0`.
+
+The release starts [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which stops if the tag and the three version fields don't match. Otherwise it deploys to WordPress.org with [10up/action-wordpress-plugin-deploy](https://github.com/10up/action-wordpress-plugin-deploy) and attaches a zip to the GitHub release. Pre-releases are not deployed. Files listed in `.distignore` are left out.
+
+The workflow needs two repository secrets: `SVN_USERNAME` (your WordPress.org username) and `SVN_PASSWORD` (the SVN password from your WordPress.org profile, not your account password).
+
+Banner, icon and screenshots for the WordPress.org page go in `.wordpress-org/` (for example `banner-772x250.png` and `icon-256x256.png`). See [Plugin Assets](https://developer.wordpress.org/plugins/wordpress-org/plugin-assets/) for sizes. They are published with the next release.
+
 ## License
 
 This plugin is licensed under the [GNU General Public License v2.0 or later](https://www.gnu.org/licenses/gpl-2.0.html).
