@@ -64,6 +64,8 @@ class Acronyms_DB {
 		}
 
 		update_option( 'acronyms_db_version', ACRONYMS_DB_VERSION );
+
+		Acronyms_Central::sync_schedule();
 	}
 
 	/**
@@ -71,6 +73,7 @@ class Acronyms_DB {
 	 */
 	public static function deactivate() {
 		delete_transient( self::CACHE_KEY );
+		Acronyms_Central::unschedule();
 	}
 
 	/**
@@ -84,7 +87,13 @@ class Acronyms_DB {
 
 		delete_option( 'acronyms_post_types' );
 		delete_option( 'acronyms_db_version' );
+		delete_option( Acronyms_Central::OPTION_ENABLED );
+		delete_option( Acronyms_Central::OPTION_URL );
+		delete_option( Acronyms_Central::OPTION_LIST );
+		delete_option( Acronyms_Central::OPTION_STATUS );
+		delete_option( Acronyms_Central::OPTION_EXCLUDED );
 		delete_transient( self::CACHE_KEY );
+		Acronyms_Central::unschedule();
 	}
 
 	/**
@@ -100,111 +109,74 @@ class Acronyms_DB {
 
 	/**
 	 * Get all acronyms for front-end replacement, sorted longest-first.
-	 * Uses transient caching.
+	 *
+	 * Local acronyms are merged with the central list. A local acronym wins over a
+	 * central one with the same text (ignoring case), and central acronyms turned
+	 * off on this site are left out. Uses transient caching; the cache is tied to
+	 * the plugin version, since the bundled central list changes with it.
 	 *
 	 * @return array Array of objects with acronym, title, case_sensitive properties.
 	 */
 	public static function get_acronyms_for_replacement() {
 		$cached = get_transient( self::CACHE_KEY );
 
-		if ( false !== $cached ) {
-			return $cached;
+		if ( is_array( $cached ) && isset( $cached['version'], $cached['items'] ) && ACRONYMS_VERSION === $cached['version'] ) {
+			return $cached['items'];
 		}
 
 		global $wpdb;
 		$table = self::table_name();
 
 		$results = $wpdb->get_results(
-			"SELECT acronym, title, case_sensitive FROM {$table} ORDER BY CHAR_LENGTH(acronym) DESC" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			"SELECT acronym, title, case_sensitive FROM {$table}" // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		);
 
 		if ( ! is_array( $results ) ) {
 			$results = array();
 		}
 
-		set_transient( self::CACHE_KEY, $results, self::CACHE_TTL );
+		$local_keys = array();
+		foreach ( $results as $row ) {
+			$local_keys[ Acronyms_Central::key( $row->acronym ) ] = true;
+		}
+
+		foreach ( Acronyms_Central::get_active_entries() as $entry ) {
+			if ( ! isset( $local_keys[ Acronyms_Central::key( $entry['acronym'] ) ] ) ) {
+				$results[] = (object) $entry;
+			}
+		}
+
+		usort(
+			$results,
+			function ( $a, $b ) {
+				return mb_strlen( $b->acronym ) - mb_strlen( $a->acronym );
+			}
+		);
+
+		set_transient(
+			self::CACHE_KEY,
+			array(
+				'version' => ACRONYMS_VERSION,
+				'items'   => $results,
+			),
+			self::CACHE_TTL
+		);
 
 		return $results;
 	}
 
 	/**
-	 * Get paginated acronyms for the admin list table.
+	 * Get all local acronyms, for the admin list.
 	 *
-	 * @param array $args {
-	 *     Query arguments.
-	 *
-	 *     @type int    $per_page Number of items per page. Default 20.
-	 *     @type int    $page     Current page number. Default 1.
-	 *     @type string $orderby  Column to order by. Default 'acronym'.
-	 *     @type string $order    Sort direction (ASC or DESC). Default 'ASC'.
-	 *     @type string $search   Search term. Default empty.
-	 * }
 	 * @return array Array of acronym objects.
 	 */
-	public static function get_acronyms( $args = array() ) {
-		global $wpdb;
-
-		$defaults = array(
-			'per_page' => 20,
-			'page'     => 1,
-			'orderby'  => 'acronym',
-			'order'    => 'ASC',
-			'search'   => '',
-		);
-
-		$args  = wp_parse_args( $args, $defaults );
-		$table = self::table_name();
-
-		$allowed_orderby = array( 'acronym', 'title', 'created_at' );
-		$orderby         = in_array( $args['orderby'], $allowed_orderby, true ) ? $args['orderby'] : 'acronym';
-		$order           = 'DESC' === strtoupper( $args['order'] ) ? 'DESC' : 'ASC';
-		$per_page        = absint( $args['per_page'] );
-		$offset          = absint( ( $args['page'] - 1 ) * $per_page );
-
-		if ( ! empty( $args['search'] ) ) {
-			$like = '%' . $wpdb->esc_like( $args['search'] ) . '%';
-			return $wpdb->get_results(
-				$wpdb->prepare(
-					"SELECT * FROM {$table} WHERE acronym LIKE %s OR title LIKE %s ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					$like,
-					$like,
-					$per_page,
-					$offset
-				)
-			);
-		}
-
-		return $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT * FROM {$table} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$per_page,
-				$offset
-			)
-		);
-	}
-
-	/**
-	 * Count total acronyms, optionally filtered by search term.
-	 *
-	 * @param string $search Search term. Default empty.
-	 * @return int Total count.
-	 */
-	public static function count_acronyms( $search = '' ) {
+	public static function get_all_acronyms() {
 		global $wpdb;
 		$table = self::table_name();
 
-		if ( ! empty( $search ) ) {
-			$like = '%' . $wpdb->esc_like( $search ) . '%';
-			return (int) $wpdb->get_var(
-				$wpdb->prepare(
-					"SELECT COUNT(*) FROM {$table} WHERE acronym LIKE %s OR title LIKE %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					$like,
-					$like
-				)
-			);
-		}
+		$results = $wpdb->get_results( "SELECT * FROM {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return is_array( $results ) ? $results : array();
 	}
 
 	/**

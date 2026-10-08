@@ -1,0 +1,11 @@
+{
+	"version": 1,
+	"updated": "2026-10-08",
+	"acronyms": [
+		{ "acronym": "API", "title": "Application Programming Interface", "case_sensitive": true },
+		{ "acronym": "CSS", "title": "Cascading Style Sheets", "case_sensitive": true },
+		{ "acronym": "HTML", "title": "HyperText Markup Language", "case_sensitive": true },
+		{ "acronym": "PDF", "title": "Portable Document Format", "case_sensitive": true },
+		{ "acronym": "URL", "title": "Uniform Resource Locator", "case_sensitive": true }
+	]
+}

@@ -20,3 +20,11 @@ delete_option( 'acronyms_post_types' );
 delete_option( 'acronyms_db_version' );
 
 delete_transient( 'acronyms_list' );
+
+delete_option( 'acronyms_central_remote_enabled' );
+delete_option( 'acronyms_central_url' );
+delete_option( 'acronyms_central_list' );
+delete_option( 'acronyms_central_status' );
+delete_option( 'acronyms_central_excluded' );
+
+wp_clear_scheduled_hook( 'acronyms_central_refresh' );

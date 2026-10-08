@@ -70,6 +70,152 @@ class Acronyms_Admin {
 			'acronyms_settings',
 			'acronyms_content_filtering'
 		);
+
+		register_setting(
+			'acronyms_settings',
+			Acronyms_Central::OPTION_ENABLED,
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => array( $this, 'sanitize_central_enabled' ),
+				'default'           => 0,
+			)
+		);
+
+		register_setting(
+			'acronyms_settings',
+			Acronyms_Central::OPTION_URL,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => array( $this, 'sanitize_central_url' ),
+				'default'           => '',
+			)
+		);
+
+		add_settings_section(
+			'acronyms_central',
+			__( 'Central List', 'acronym-tooltips' ),
+			array( $this, 'render_central_section' ),
+			'acronyms_settings'
+		);
+
+		add_settings_field(
+			Acronyms_Central::OPTION_ENABLED,
+			__( 'Fetch Updates', 'acronym-tooltips' ),
+			array( $this, 'render_central_enabled_field' ),
+			'acronyms_settings',
+			'acronyms_central'
+		);
+
+		add_settings_field(
+			Acronyms_Central::OPTION_URL,
+			__( 'List URL', 'acronym-tooltips' ),
+			array( $this, 'render_central_url_field' ),
+			'acronyms_settings',
+			'acronyms_central'
+		);
+	}
+
+	/**
+	 * Sanitize the "fetch central list" setting.
+	 *
+	 * @param mixed $value Raw input value.
+	 * @return int 1 if turned on, 0 if not.
+	 */
+	public function sanitize_central_enabled( $value ) {
+		return empty( $value ) ? 0 : 1;
+	}
+
+	/**
+	 * Sanitize the central list URL. An empty value, or the default URL, means "use the default".
+	 *
+	 * @param mixed $value Raw input value.
+	 * @return string Sanitized URL, or an empty string for the default.
+	 */
+	public function sanitize_central_url( $value ) {
+		$value = trim( (string) $value );
+
+		if ( '' === $value || Acronyms_Central::DEFAULT_URL === $value ) {
+			return '';
+		}
+
+		$url = esc_url_raw( $value, array( 'https' ) );
+
+		if ( '' === $url ) {
+			add_settings_error(
+				'acronyms_settings',
+				'acronyms_central_url',
+				__( 'The list URL must be a valid address starting with https://. The previous URL is kept.', 'acronym-tooltips' ),
+				'error'
+			);
+			return get_option( Acronyms_Central::OPTION_URL, '' );
+		}
+
+		return $url;
+	}
+
+	/**
+	 * Render the central list section description.
+	 */
+	public function render_central_section() {
+		echo '<p>' . esc_html__( 'The plugin comes with a central list of common acronyms, used together with your own. If you have an acronym with the same text, yours is used. You can turn off single central acronyms in the acronym list.', 'acronym-tooltips' ) . '</p>';
+	}
+
+	/**
+	 * Render the "fetch central list" checkbox.
+	 */
+	public function render_central_enabled_field() {
+		printf(
+			'<label><input type="checkbox" name="%1$s" value="1" %2$s /> %3$s</label><p class="description">%4$s</p>',
+			esc_attr( Acronyms_Central::OPTION_ENABLED ),
+			checked( Acronyms_Central::is_remote_enabled(), true, false ),
+			esc_html__( 'Fetch the latest central list from the internet once a day', 'acronym-tooltips' ),
+			esc_html__( 'Off by default. When on, your site downloads the list from the URL below. Nothing about your site is sent beyond a normal web request. When off, the copy bundled with the plugin is used.', 'acronym-tooltips' )
+		);
+	}
+
+	/**
+	 * Render the central list URL field, with the default URL shown below it.
+	 */
+	public function render_central_url_field() {
+		printf(
+			'<input type="url" class="large-text code" name="%1$s" value="%2$s" placeholder="%3$s" />',
+			esc_attr( Acronyms_Central::OPTION_URL ),
+			esc_attr( get_option( Acronyms_Central::OPTION_URL, '' ) ),
+			esc_attr( Acronyms_Central::DEFAULT_URL )
+		);
+
+		echo '<p class="description">';
+		esc_html_e( 'Leave empty to use the default list:', 'acronym-tooltips' );
+		echo ' <code>' . esc_html( Acronyms_Central::DEFAULT_URL ) . '</code></p>';
+
+		if ( Acronyms_Central::has_custom_url() ) {
+			printf(
+				'<p><a href="%s" class="button">%s</a></p>',
+				esc_url( $this->action_url( 'central_reset_url', 'acronyms_central_reset_url' ) ),
+				esc_html__( 'Restore default URL', 'acronym-tooltips' )
+			);
+		}
+	}
+
+	/**
+	 * Build a nonce-protected admin URL for a plugin action.
+	 *
+	 * @param string $action Action name.
+	 * @param string $nonce  Nonce action.
+	 * @return string URL.
+	 */
+	private function action_url( $action, $nonce ) {
+		return wp_nonce_url(
+			add_query_arg(
+				array(
+					'page'   => 'acronyms',
+					'tab'    => 'settings',
+					'action' => $action,
+				),
+				admin_url( 'options-general.php' )
+			),
+			$nonce
+		);
 	}
 
 	/**
@@ -148,6 +294,98 @@ class Acronyms_Admin {
 		$this->handle_add();
 		$this->handle_edit();
 		$this->handle_delete();
+		$this->handle_central_toggle();
+		$this->handle_central_fetch();
+		$this->handle_central_reset_url();
+	}
+
+	/**
+	 * Handle turning a central acronym off or on for this site.
+	 */
+	private function handle_central_toggle() {
+		if ( ! isset( $_GET['action'], $_GET['central'] ) || ! in_array( $_GET['action'], array( 'central_enable', 'central_disable' ), true ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is checked below, once the acronym is known.
+			return;
+		}
+
+		$acronym = sanitize_text_field( wp_unslash( $_GET['central'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is checked on the next line.
+		check_admin_referer( 'acronyms_central_toggle_' . Acronyms_Central::key( $acronym ) );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Unauthorized access.', 'acronym-tooltips' ) );
+		}
+
+		$disable = 'central_disable' === $_GET['action'];
+		Acronyms_Central::set_excluded( $acronym, $disable );
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'    => 'acronyms',
+					'message' => $disable ? 'central_disabled' : 'central_enabled',
+				),
+				admin_url( 'options-general.php' )
+			)
+		);
+		exit;
+	}
+
+	/**
+	 * Handle the "Fetch now" button.
+	 */
+	private function handle_central_fetch() {
+		if ( ! isset( $_GET['action'] ) || 'central_fetch' !== $_GET['action'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is checked on the next line.
+			return;
+		}
+
+		check_admin_referer( 'acronyms_central_fetch' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Unauthorized access.', 'acronym-tooltips' ) );
+		}
+
+		$result = Acronyms_Central::fetch();
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'    => 'acronyms',
+					'tab'     => 'settings',
+					'message' => is_wp_error( $result ) ? 'central_fetch_failed' : 'central_fetched',
+				),
+				admin_url( 'options-general.php' )
+			)
+		);
+		exit;
+	}
+
+	/**
+	 * Handle the "Restore default URL" button.
+	 */
+	private function handle_central_reset_url() {
+		if ( ! isset( $_GET['action'] ) || 'central_reset_url' !== $_GET['action'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce is checked on the next line.
+			return;
+		}
+
+		check_admin_referer( 'acronyms_central_reset_url' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Unauthorized access.', 'acronym-tooltips' ) );
+		}
+
+		delete_option( Acronyms_Central::OPTION_URL );
+		Acronyms_Central::on_url_changed();
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'    => 'acronyms',
+					'tab'     => 'settings',
+					'message' => 'central_url_reset',
+				),
+				admin_url( 'options-general.php' )
+			)
+		);
+		exit;
 	}
 
 	/**
@@ -385,15 +623,26 @@ class Acronyms_Admin {
 		$message = sanitize_text_field( wp_unslash( $_GET['message'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$messages = array(
-			'added'   => __( 'Acronym added successfully.', 'acronym-tooltips' ),
-			'updated' => __( 'Acronym updated successfully.', 'acronym-tooltips' ),
-			'deleted' => __( 'Acronym deleted successfully.', 'acronym-tooltips' ),
+			'added'             => __( 'Acronym added successfully.', 'acronym-tooltips' ),
+			'updated'           => __( 'Acronym updated successfully.', 'acronym-tooltips' ),
+			'deleted'           => __( 'Acronym deleted successfully.', 'acronym-tooltips' ),
+			'central_disabled'  => __( 'Central acronym turned off for this site.', 'acronym-tooltips' ),
+			'central_enabled'   => __( 'Central acronym turned on for this site.', 'acronym-tooltips' ),
+			'central_fetched'   => __( 'Central list fetched.', 'acronym-tooltips' ),
+			'central_url_reset' => __( 'The default URL for the central list is restored.', 'acronym-tooltips' ),
 		);
 
 		if ( isset( $messages[ $message ] ) ) {
 			printf(
 				'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
 				esc_html( $messages[ $message ] )
+			);
+		}
+
+		if ( 'central_fetch_failed' === $message ) {
+			printf(
+				'<div class="notice notice-error is-dismissible"><p>%s</p></div>',
+				esc_html__( 'Could not fetch the central list. See the status below for details.', 'acronym-tooltips' )
 			);
 		}
 
@@ -511,7 +760,72 @@ class Acronyms_Admin {
 				submit_button();
 				?>
 			</form>
+
+			<?php $this->render_central_status(); ?>
 		</div>
+		<?php
+	}
+
+	/**
+	 * Render the status of the central list, with the "Fetch now" button.
+	 */
+	private function render_central_status() {
+		$status      = Acronyms_Central::get_status();
+		$date_format = get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+
+		if ( Acronyms_Central::uses_fetched_list() ) {
+			$source = __( 'Fetched from the URL', 'acronym-tooltips' );
+		} elseif ( Acronyms_Central::is_remote_enabled() ) {
+			$source = __( 'Bundled with the plugin (no successful fetch yet)', 'acronym-tooltips' );
+		} else {
+			$source = __( 'Bundled with the plugin', 'acronym-tooltips' );
+		}
+		?>
+		<h2><?php esc_html_e( 'Central List Status', 'acronym-tooltips' ); ?></h2>
+		<table class="form-table" role="presentation">
+			<tr>
+				<th scope="row"><?php esc_html_e( 'In use', 'acronym-tooltips' ); ?></th>
+				<td>
+					<?php
+					echo esc_html( $source );
+					echo ' &middot; ';
+					/* translators: %d: number of acronyms. */
+					echo esc_html( sprintf( _n( '%d acronym', '%d acronyms', count( Acronyms_Central::get_entries() ), 'acronym-tooltips' ), count( Acronyms_Central::get_entries() ) ) );
+					?>
+				</td>
+			</tr>
+			<?php if ( Acronyms_Central::is_remote_enabled() ) : ?>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Last fetched', 'acronym-tooltips' ); ?></th>
+					<td>
+						<?php
+						echo $status['last_success']
+							? esc_html( wp_date( $date_format, $status['last_success'] ) )
+							: esc_html__( 'Never', 'acronym-tooltips' );
+						?>
+					</td>
+				</tr>
+				<?php if ( '' !== $status['error'] ) : ?>
+					<tr>
+						<th scope="row"><?php esc_html_e( 'Last error', 'acronym-tooltips' ); ?></th>
+						<td>
+							<?php
+							echo esc_html( wp_date( $date_format, $status['last_attempt'] ) . ': ' . $status['error'] );
+							?>
+							<p class="description"><?php esc_html_e( 'The last good copy is used until a fetch succeeds.', 'acronym-tooltips' ); ?></p>
+						</td>
+					</tr>
+				<?php endif; ?>
+				<tr>
+					<th scope="row"></th>
+					<td>
+						<a href="<?php echo esc_url( $this->action_url( 'central_fetch', 'acronyms_central_fetch' ) ); ?>" class="button">
+							<?php esc_html_e( 'Fetch now', 'acronym-tooltips' ); ?>
+						</a>
+					</td>
+				</tr>
+			<?php endif; ?>
+		</table>
 		<?php
 	}
 }
